@@ -9,3 +9,6 @@ cpu = CPU()
 
 cpu.load()
 cpu.run()
+
+
+#main take in arguments, using load method the arg at 1.
