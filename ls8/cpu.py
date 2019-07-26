@@ -9,6 +9,12 @@ LDI = 0b10000010
 MUL = 0b10100010
 PUSH = 0b01000101
 POP = 0b01000110
+CALL = 0b01010000
+RET = 0b00010001
+ADD = 0b10100000
+
+
+
 
 class CPU:
     """Main CPU class."""
@@ -60,6 +66,9 @@ class CPU:
         #elif op == "SUB": etc
         elif op == "MUL":
             self.register[reg_a] *= self.register[reg_b]
+        elif op == "CMP":
+            if self.register[reg_a] == self.register[reg_b]:
+                flag = True  
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -87,10 +96,13 @@ class CPU:
         """Run the CPU."""
 
         running = True
+        flag = False
+        
         while running:
             IR = self.ram_read(self.pc)
             operand_a = self.ram_read(self.pc+1)
             operand_b = self.ram_read(self.pc+2)
+            
 
             if IR == LDI:
                 self.register[operand_a] = operand_b
@@ -102,19 +114,39 @@ class CPU:
                 self.alu("MUL", operand_a, operand_b)
                 self.pc += 3
 
+            if IR == ADD:
+                print("ADDING")
+                self.alu("ADD",operand_a, operand_b)
+                self.pc += 3
+
             if IR == PUSH:
                 self.register[self.sp] -= 1
                 regnum = self.ram[self.pc + 1]
                 value = self.register[regnum]
                 self.ram[self.register[self.sp]] = value
+                print(f"PUSH {self.register[operand_a]}")
                 self.pc += 2
 
             if IR == POP:
                 value = self.ram[self.register[self.sp]]
                 regnum = self.ram[self.pc + 1]
                 self.register[regnum] = value
+                print(f"POP {self.register[regnum]}")
                 self.register[self.sp] += 1
                 self.pc += 2
+            
+            if IR == CALL:
+                print('CALL')
+                ret = self.pc + 2
+                self.register[self.sp] -= 1
+                self.ram[self.register[self.sp]] = ret
+                sub = self.register[operand_a]
+                self.pc = sub
+
+            elif IR == RET:
+                ret = self.ram[self.register[self.sp]]
+                self.register[self.sp] += 1
+                self.pc = ret
 
             if IR == PRN:
                 print(f"PRN {self.register[operand_a]}")
