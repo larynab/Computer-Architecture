@@ -8,6 +8,8 @@ from cpu import *
 cpu = CPU()
 cpu.load()
 cpu.run()
+
+#OLD CODE-----------------------------------------------------------------------------------
 # print(sys.argv)
 # print(len(sys.argv))
 # with open(sys.argv[1], 'r') as my_file:
